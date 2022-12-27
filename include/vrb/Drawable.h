@@ -18,8 +18,9 @@ public:
   virtual RenderStatePtr& GetRenderState() = 0;
   virtual void SetRenderState(const RenderStatePtr& aRenderState) = 0;
   virtual void Draw(const Camera& aCamera, const Matrix& aModelTransform) = 0;
-protected:
+public:
   struct State;
+protected:
   Drawable(State& aState, CreationContextPtr& aContext);
   ~Drawable();
 private:
