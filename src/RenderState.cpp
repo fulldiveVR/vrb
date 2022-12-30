@@ -58,6 +58,7 @@ struct RenderState::State : public ResourceGL::State {
   GLint uModel;
   GLint uUVTransform;
   GLint uLightCount;
+  GLint uBoneMats;
   ULight uLights[VRB_MAX_LIGHTS];
   GLint uMatterialAmbient;
   GLint uMatterialDiffuse;
@@ -69,6 +70,8 @@ struct RenderState::State : public ResourceGL::State {
   GLint aNormal;
   GLint aUV;
   GLint aColor;
+  GLint aBoneId;
+  GLint aBoneWeight;
   std::vector<Light> lights;
   Color ambient;
   Color diffuse;
@@ -81,6 +84,8 @@ struct RenderState::State : public ResourceGL::State {
   bool uvTransformEnabled;
   vrb::Matrix uvTransform;
   std::string customFragmentShader;
+  uint16_t bonesCount;
+  float *skeletonMatrices;
 
   State()
       : program(0)
@@ -90,6 +95,7 @@ struct RenderState::State : public ResourceGL::State {
       , uModel(-1)
       , uUVTransform(-1)
       , uLightCount(-1)
+      , uBoneMats(-1)
       , uMatterialAmbient(-1)
       , uMatterialDiffuse(-1)
       , uMatterialSpecular(-1)
@@ -100,14 +106,18 @@ struct RenderState::State : public ResourceGL::State {
       , aNormal(-1)
       , aUV(-1)
       , aColor(-1)
+      , aBoneId(-1)
+      , aBoneWeight(-1)
       , specularExponent(0.0f)
       , ambient(0.5f, 0.5f, 0.5f, 1.0f) // default to gray
       , diffuse(1.0f, 1.0f, 1.0f, 1.0f) // default to white
       , tintColor(1.0f, 1.0f, 1.0f, 1.0f)
       , lightId(0)
+      , bonesCount(0)
       , lightsEnabled(true)
       , uvTransformEnabled(false)
       , uvTransform(Matrix::Identity())
+      , skeletonMatrices(nullptr)
   {}
 
   void InitializeProgram();
@@ -168,6 +178,12 @@ RenderState::State::InitializeProgram() {
   if (program->SupportsFeatures(FeatureVertexColor)) {
     aColor = program->GetAttributeLocation("a_color");
   }
+
+  if(skeletonMatrices != nullptr && bonesCount > 0) {
+    aBoneId = program->GetAttributeLocation("a_boneId");
+    aBoneWeight = program->GetAttributeLocation("a_boneWeight");
+    uBoneMats = program->GetUniformLocation("u_jointMatrix");
+  }
   updateProgram = false;
 }
 
@@ -202,9 +218,24 @@ RenderState::AttributeColor() const {
   return m.aColor;
 }
 
+GLint
+RenderState::AttributeBoneId() const {
+  return m.aBoneId;
+}
+
+GLint
+RenderState::AttributeBoneWeight() const {
+  return m.aBoneWeight;
+}
+
 uint32_t
 RenderState::GetLightId() const {
   return m.lightId;
+}
+
+uint16_t
+RenderState::GetBonesCount() const {
+  return m.bonesCount;
 }
 
 void
@@ -235,6 +266,26 @@ RenderState::SetAmbient(const Color& aColor) {
 void
 RenderState::SetDiffuse(const Color& aColor) {
   m.diffuse = aColor;
+}
+void
+RenderState::SetSkeletonMatrices(const float *matrices) {
+  memcpy(m.skeletonMatrices, matrices, 16 * m.bonesCount * sizeof(float));
+}
+
+void
+RenderState::SetBonesCount(const uint16_t bonesCount) {
+  m.skeletonMatrices = new float[16 * bonesCount];
+  const float matrix[16] = {
+      1.000000, 0.000000, 0.000000, 0.000000,
+      0.000000, 1.000000, 0.000000, 0.000000,
+      0.000000, 0.000000, 1.000000, 0.000000,
+      0.000000, 0.000000, 0.000000, 1.000000
+  };
+  int stride = 16 * sizeof(float);
+  for (int i = 0; i < bonesCount; ++i) {
+    memcpy(m.skeletonMatrices + stride * i, matrix, stride);
+  }
+  m.bonesCount = bonesCount;
 }
 
 void
@@ -315,6 +366,9 @@ RenderState::Enable(const Matrix& aPerspective, const Matrix& aView, const Matri
   if (m.uvTransformEnabled) {
     VRB_GL_CHECK(glUniformMatrix4fv(m.uUVTransform, 1, GL_FALSE, m.uvTransform.Data()));
   }
+  if (m.skeletonMatrices && m.bonesCount > 0 && m.uBoneMats >= 0) {
+    VRB_GL_CHECK(glUniformMatrix4fv(m.uBoneMats, m.bonesCount, GL_FALSE, m.skeletonMatrices));
+  }
   return true;
 }
 
@@ -345,6 +399,10 @@ RenderState::InitializeGL() {
 void
 RenderState::ShutdownGL() {
   m.updateProgram = true;
+  if (m.skeletonMatrices != nullptr) {
+    delete[] m.skeletonMatrices;
+    m.skeletonMatrices = nullptr;
+  }
 }
 
 } // namespace vrb

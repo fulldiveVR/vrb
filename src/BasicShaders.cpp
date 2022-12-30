@@ -8,6 +8,7 @@ static const char* sVertexShaderSource = R"SHADER(
 #define VRB_UV_TYPE VRB_TEXTURE_UV_TYPE
 #define VRB_UV_TRANSFORM VRB_UV_TRANSFORM_ENABLED
 #define VRB_VERTEX_COLOR VRB_VERTEX_COLOR_ENABLED
+#define VRB_BONES VRB_BONES_COUNT
 
 struct Light {
   vec3 direction;
@@ -36,6 +37,12 @@ uniform mat4 u_uv_transform;
 
 attribute vec3 a_position;
 attribute vec3 a_normal;
+
+#if VRB_BONES != 0
+attribute vec4 a_boneId;
+attribute vec4 a_boneWeight;
+uniform mat4 u_jointMatrix[VRB_BONES];
+#endif
 
 varying vec4 v_color;
 
@@ -93,7 +100,21 @@ void main(void) {
   v_uv = a_uv;
 #endif // VRB_UV_TRANSFORM
 #endif // VRB_USE_TEXTURE
-  gl_Position = u_perspective * u_view * u_model * vec4(a_position.xyz, 1);
+
+vec4 localVertex;
+
+#if VRB_BONES == 0
+  localVertex = vec4(a_position.xyz, 1.0);
+#else
+  mat4 localPose = mat4(0);
+  localPose += u_jointMatrix[int(a_boneId.x)] * a_boneWeight.x;
+  localPose += u_jointMatrix[int(a_boneId.y)] * a_boneWeight.y;
+  localPose += u_jointMatrix[int(a_boneId.z)] * a_boneWeight.z;
+  localPose += u_jointMatrix[int(a_boneId.w)] * a_boneWeight.w;
+  localVertex = localPose * vec4(a_position.xyz, 1.0);
+#endif // VRB_BONES
+
+  gl_Position = u_perspective * u_view * u_model * localVertex;
 }
 
 )SHADER";

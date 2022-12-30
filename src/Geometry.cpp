@@ -79,10 +79,13 @@ Geometry::UpdateBuffers() {
 
   const bool kHasTextureCoords = m.vertexArray->GetUVCount() > 0;
   const bool kHasColor = m.vertexArray->GetColorCount() > 0;
+  const bool kHasBones = m.vertexArray->GetBonesIdsCount() > 0 && m.vertexArray->GetBonesWeightsCount() > 0;
   const GLsizei kPositionSize = m.renderBuffer->PositionSize();
   const GLsizei kNormalSize = m.renderBuffer->NormalSize();
   const GLsizei kUVSize = m.renderBuffer->UVSize();
   const GLsizei kColorSize = m.renderBuffer->ColorSize();
+  const GLsizei kBISize = m.renderBuffer->BoneIdSize();
+  const GLsizei kBWSize = m.renderBuffer->BoneWeightSize();
 
   VRB_GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vertexObjectId));
 
@@ -103,10 +106,14 @@ Geometry::UpdateBuffers() {
     const auto vertexIndex = (GLushort)(face.vertices[0] - 1);
     const auto normalIndex = (GLushort)(face.normals[0] - 1);
     const auto uvIndex = (GLushort)(kHasTextureCoords ? face.uvs[0] - 1 : -1);
+    const auto biIndex = (GLushort)(kHasBones ? face.boneids[0] - 1 : -1);
+    const auto bwIndex = (GLushort)(kHasBones ? face.boneweights[0] - 1 : -1);
     const Vector& firstVertex = m.vertexArray->GetVertex(vertexIndex);
     const Vector& firstNormal = m.vertexArray->GetNormal(normalIndex);
     const Vector& firstUV = m.vertexArray->GetUV(uvIndex);
     const Color& firstColor = m.vertexArray->GetColor(vertexIndex);
+    const Color& firstBoneId = m.vertexArray->GetBoneId(biIndex);
+    const Color& firstBoneWeight = m.vertexArray->GetBoneWeight(bwIndex);
     for (int ix = 1; ix <= face.vertices.size() - 2; ix++) {
       VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kPositionSize, firstVertex.Data()));
       offset += kPositionSize;
@@ -119,6 +126,12 @@ Geometry::UpdateBuffers() {
       if (kHasColor) {
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kColorSize, firstColor.Data()));
         offset += kColorSize;
+      }
+      if (kHasBones) {
+        VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBISize, firstBoneId.Data()));
+        offset += kBISize;
+        VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBWSize, firstBoneWeight.Data()));
+        offset += kBWSize;
       }
       indices.push_back(count);
       count++;
@@ -139,6 +152,14 @@ Geometry::UpdateBuffers() {
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kColorSize, color1.Data()));
         offset += kColorSize;
       }
+      if (kHasBones) {
+        const Color bi = m.vertexArray->GetBoneId(face.boneids[ix] - 1);
+        const Color bw = m.vertexArray->GetBoneWeight(face.boneweights[ix] - 1);
+        VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBISize, bi.Data()));
+        offset += kBISize;
+        VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBWSize, bw.Data()));
+        offset += kBWSize;
+      }
       indices.push_back(count);
       count++;
 
@@ -157,6 +178,14 @@ Geometry::UpdateBuffers() {
         const Color& color2 = m.vertexArray->GetColor(face.vertices[ix + 1] - 1);
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kColorSize, color2.Data()));
         offset += kColorSize;
+      }
+      if (kHasBones) {
+        const Color bi = m.vertexArray->GetBoneId(face.boneids[ix + 1] - 1);
+        const Color bw = m.vertexArray->GetBoneWeight(face.boneweights[ix + 1] - 1);
+        VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBISize, bi.Data()));
+        offset += kBISize;
+        VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBWSize, bw.Data()));
+        offset += kBWSize;
       }
       indices.push_back(count);
       count++;
@@ -177,6 +206,16 @@ Geometry::AddFace(
     const std::vector<int>& aVertices,
     const std::vector<int>& aUVs,
     const std::vector<int>& aNormals) {
+  std::vector<int> empty;
+  AddFace(aVertices, aUVs, aNormals, empty, empty);
+}
+void
+Geometry::AddFace(
+    const std::vector<int>& aVertices,
+    const std::vector<int>& aUVs,
+    const std::vector<int>& aNormals,
+    const std::vector<int>& aBoneIds,
+    const std::vector<int>& aBoneWeights) {
 
   Face face;
   m.vertexCount += aVertices.size();
@@ -197,6 +236,13 @@ Geometry::AddFace(
   }
   if (!aUVs.empty()) {
     CopyIndices(face.uvs, aUVs);
+  }
+  if (!aBoneIds.empty()) {
+    CopyIndices(face.boneids, aBoneIds);
+  }
+
+  if (!aBoneWeights.empty()) {
+    CopyIndices(face.boneweights, aBoneWeights);
   }
 
   if (!aNormals.empty() && (aNormals[0] != 0)) {
@@ -263,6 +309,15 @@ Geometry::InitializeGL() {
   }
   if (m.vertexArray->GetColorCount() > 0) {
     m.renderBuffer->DefineColor(definedOffset);
+    definedOffset = m.renderBuffer->ColorOffset() + m.renderBuffer->ColorSize();
+  }
+  if (m.vertexArray->GetBonesIdsCount() > 0) {
+    m.renderBuffer->DefineBI(definedOffset);
+    definedOffset = m.renderBuffer->BoneIdOffset() + m.renderBuffer->BoneIdSize();
+  }
+  if (m.vertexArray->GetBonesWeightsCount() > 0) {
+    m.renderBuffer->DefineBW(definedOffset);
+    definedOffset = m.renderBuffer->BoneWeightOffset() + m.renderBuffer->BoneWeightSize();
   }
   GLuint vertexObjectId = 0;
   GLuint indexObjectId = 0;

@@ -19,6 +19,8 @@ public:
   int GetNormalCount() const;
   int GetUVCount() const;
   int GetColorCount() const;
+  int GetBonesWeightsCount() const;
+  int GetBonesIdsCount() const;
 
   void SetNormalCount(const int aCount);
 
@@ -29,6 +31,8 @@ public:
   const Vector& GetNormal(const int aIndex) const;
   const Vector& GetUV(const int aIndex) const;
   const Color& GetColor(const int aIndex) const;
+  const Color& GetBoneId(const int aIndex) const; // color because we needs 4 components
+  const Color& GetBoneWeight(const int aIndex) const; // color because we needs 4 components
 
   void SetVertex(const int aIndex, const Vector& aPoint);
   void SetNormal(const int aIndex, const Vector& aNormal);
@@ -39,6 +43,8 @@ public:
   int AppendNormal(const Vector& aNormal);
   int AppendUV(const Vector& aUV);
   int AppendColor(const Color& aUV);
+  int AppendBonesWeights(const Color& weights);
+  int AppendBonesIds(const Color& ids);
 
   void AddNormal(const int aIndex, const Vector& aNormal);
 

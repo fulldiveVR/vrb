@@ -27,6 +27,8 @@ struct VertexArray::State {
   std::vector<NormalState> normals;
   std::vector<Vector> uvs;
   std::vector<Color> colors;
+  std::vector<Color> bonesIds;
+  std::vector<Color> bonesWeights;
 };
 
 VertexArrayPtr
@@ -52,6 +54,16 @@ VertexArray::GetUVCount() const {
 int
 VertexArray::GetColorCount() const {
   return m.colors.size();
+}
+
+int
+VertexArray::GetBonesWeightsCount() const {
+  return m.bonesWeights.size();
+}
+
+int
+VertexArray::GetBonesIdsCount() const {
+  return m.bonesIds.size();
 }
 
 void
@@ -107,13 +119,28 @@ VertexArray::GetUV(const int aIndex) const {
   return m.uvs[aIndex];
 }
 
-
 const Color&
 VertexArray::GetColor(const int aIndex) const {
   if (aIndex >= m.colors.size()) {
     return Color::Zero();
   }
   return m.colors[aIndex];
+}
+
+const Color&
+VertexArray::GetBoneId(const int aIndex) const {
+  if (aIndex >= m.bonesIds.size()) {
+    return Color::Zero();
+  }
+  return m.bonesIds[aIndex];
+}
+
+const Color&
+VertexArray::GetBoneWeight(const int aIndex) const {
+  if (aIndex >= m.bonesWeights.size()) {
+    return Color::Zero();
+  }
+  return m.bonesWeights[aIndex];
 }
 
 void
@@ -182,6 +209,18 @@ int
 VertexArray::AppendColor(const Color& aColor) {
   m.colors.push_back(aColor);
   return m.colors.size() - 1;
+}
+
+int
+VertexArray::AppendBonesWeights(const Color& weights) {
+  m.bonesWeights.push_back(weights);
+  return m.bonesWeights.size() - 1;
+}
+
+int
+VertexArray::AppendBonesIds(const Color& ids) {
+  m.bonesIds.push_back(ids);
+  return m.bonesIds.size() - 1;
 }
 
 VertexArray::VertexArray(State& aState, CreationContextPtr& aContext) : m(aState) {}

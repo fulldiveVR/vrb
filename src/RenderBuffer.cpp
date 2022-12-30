@@ -29,6 +29,10 @@ struct RenderBuffer::State {
   GLsizei uvLength = 0;
   size_t colorOffset = 0;
   GLsizei colorLength = 0;
+  size_t boneIdOffset = 0;
+  GLsizei boneIdLength = 0;
+  size_t boneWeightOffset = 0;
+  GLsizei boneWeightLength = 0;
 
   State() = default;
   ~State() = default;
@@ -47,8 +51,16 @@ struct RenderBuffer::State {
     return colorLength* sizeof(float);
   }
 
+  GLsizei BoneWeightSize() const {
+    return boneWeightLength* sizeof(float);
+  }
+
+  GLsizei BoneIdSize() const {
+    return boneIdLength * sizeof(float);
+  }
+
   GLsizei VertexSize() const {
-    return PositionSize() + NormalSize() + ColorSize() + UVSize();
+    return PositionSize() + NormalSize() + ColorSize() + UVSize() + BoneIdSize() + BoneWeightSize();
   }
 };
 
@@ -170,6 +182,48 @@ RenderBuffer::ColorOffset() const {
 GLsizei
 RenderBuffer::ColorLength() const {
   return m.colorLength;
+}
+
+void
+RenderBuffer::DefineBI(const size_t aOffset, const GLsizei aLength) {
+  m.boneIdOffset = aOffset;
+  m.boneIdLength = aLength;
+}
+
+void
+RenderBuffer::DefineBW(const size_t aOffset, const GLsizei aLength) {
+  m.boneWeightOffset = aOffset;
+  m.boneWeightLength = aLength;
+}
+
+
+  GLsizei
+RenderBuffer::BoneIdLength() const {
+  return m.boneIdLength;
+}
+
+size_t
+RenderBuffer::BoneIdOffset() const {
+  return m.boneIdOffset;
+}
+GLsizei
+RenderBuffer::BoneWeightLength() const {
+  return m.boneWeightLength;
+}
+
+GLsizei
+RenderBuffer::BoneIdSize() const {
+  return m.BoneIdSize();
+}
+
+GLsizei
+RenderBuffer::BoneWeightSize() const {
+  return m.BoneWeightSize();
+}
+
+size_t
+RenderBuffer::BoneWeightOffset() const {
+  return m.boneWeightOffset;
 }
 
 GLsizei

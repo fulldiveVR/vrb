@@ -39,6 +39,16 @@ public:
   size_t ColorOffset() const;
   GLsizei ColorSize() const;
   GLsizei ColorLength() const;
+  GLsizei BoneIdLength() const;
+  GLsizei BoneIdSize() const;
+  size_t BoneIdOffset() const;
+  GLsizei BoneWeightLength() const;
+  GLsizei BoneWeightSize() const;
+  size_t BoneWeightOffset() const;
+
+  void DefineBI(const size_t aOffset, const GLsizei aLength = 4);
+  void DefineBW(const size_t aOffset, const GLsizei aLength = 4);
+
   void Bind();
   void Unbind();
 
