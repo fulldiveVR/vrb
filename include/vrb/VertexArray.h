@@ -8,6 +8,7 @@
 
 #include "vrb/Forward.h"
 #include "vrb/MacroUtils.h"
+#include "Vector4.h"
 
 namespace vrb {
 
@@ -31,8 +32,8 @@ public:
   const Vector& GetNormal(const int aIndex) const;
   const Vector& GetUV(const int aIndex) const;
   const Color& GetColor(const int aIndex) const;
-  const Color& GetBoneId(const int aIndex) const; // color because we needs 4 components
-  const Color& GetBoneWeight(const int aIndex) const; // color because we needs 4 components
+  const Vector4& GetBoneId(const int aIndex) const;
+  const Vector4& GetBoneWeight(const int aIndex) const;
 
   void SetVertex(const int aIndex, const Vector& aPoint);
   void SetNormal(const int aIndex, const Vector& aNormal);
@@ -43,8 +44,8 @@ public:
   int AppendNormal(const Vector& aNormal);
   int AppendUV(const Vector& aUV);
   int AppendColor(const Color& aUV);
-  int AppendBonesWeights(const Color& weights);
-  int AppendBonesIds(const Color& ids);
+  int AppendBonesWeights(const Vector4& weights);
+  int AppendBonesIds(const Vector4& ids);
 
   void AddNormal(const int aIndex, const Vector& aNormal);
 

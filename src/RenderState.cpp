@@ -283,7 +283,7 @@ RenderState::SetBonesCount(const uint16_t bonesCount) {
   };
   int stride = 16 * sizeof(float);
   for (int i = 0; i < bonesCount; ++i) {
-    memcpy(m.skeletonMatrices + stride * i, matrix, stride);
+    memcpy(m.skeletonMatrices + 16 * i, matrix, stride);
   }
   m.bonesCount = bonesCount;
 }

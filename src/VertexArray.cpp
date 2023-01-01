@@ -8,6 +8,7 @@
 #include "vrb/ConcreteClass.h"
 #include "vrb/Color.h"
 #include "vrb/Vector.h"
+#include "vrb/Vector4.h"
 
 #include <vector>
 
@@ -27,8 +28,8 @@ struct VertexArray::State {
   std::vector<NormalState> normals;
   std::vector<Vector> uvs;
   std::vector<Color> colors;
-  std::vector<Color> bonesIds;
-  std::vector<Color> bonesWeights;
+  std::vector<Vector4> bonesIds;
+  std::vector<Vector4> bonesWeights;
 };
 
 VertexArrayPtr
@@ -127,18 +128,18 @@ VertexArray::GetColor(const int aIndex) const {
   return m.colors[aIndex];
 }
 
-const Color&
+const Vector4&
 VertexArray::GetBoneId(const int aIndex) const {
   if (aIndex >= m.bonesIds.size()) {
-    return Color::Zero();
+    return Vector4::Zero();
   }
   return m.bonesIds[aIndex];
 }
 
-const Color&
+const Vector4&
 VertexArray::GetBoneWeight(const int aIndex) const {
   if (aIndex >= m.bonesWeights.size()) {
-    return Color::Zero();
+    return Vector4::Zero();
   }
   return m.bonesWeights[aIndex];
 }
@@ -212,13 +213,13 @@ VertexArray::AppendColor(const Color& aColor) {
 }
 
 int
-VertexArray::AppendBonesWeights(const Color& weights) {
+VertexArray::AppendBonesWeights(const Vector4& weights) {
   m.bonesWeights.push_back(weights);
   return m.bonesWeights.size() - 1;
 }
 
 int
-VertexArray::AppendBonesIds(const Color& ids) {
+VertexArray::AppendBonesIds(const Vector4& ids) {
   m.bonesIds.push_back(ids);
   return m.bonesIds.size() - 1;
 }
