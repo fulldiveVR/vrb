@@ -23,8 +23,6 @@ public:
     std::vector<GLushort> vertices;
     std::vector<GLushort> uvs;
     std::vector<GLushort> normals;
-    std::vector<GLushort> boneids;
-    std::vector<GLushort> boneweights;
   };
 
   // Geometry interface
@@ -36,13 +34,6 @@ public:
     const std::vector<int> &aVerticies,
     const std::vector<int> &aUVs,
     const std::vector<int> &aNormals);
-
-  void AddFace(
-    const std::vector<int> &aVerticies,
-    const std::vector<int> &aUVs,
-    const std::vector<int> &aNormals,
-    const std::vector<int> &aBoneIds,
-    const std::vector<int> &aBoneWeights);
 
   int32_t GetFaceCount() const;
   const Face& GetFace(int32_t aIndex) const;

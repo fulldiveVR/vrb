@@ -29,10 +29,10 @@ struct RenderBuffer::State {
   GLsizei uvLength = 0;
   size_t colorOffset = 0;
   GLsizei colorLength = 0;
-  size_t boneIdOffset = 0;
-  GLsizei boneIdLength = 0;
-  size_t boneWeightOffset = 0;
-  GLsizei boneWeightLength = 0;
+  size_t jointIdOffset = 0;
+  GLsizei jointIdLength = 0;
+  size_t jointWeightOffset = 0;
+  GLsizei jointWeightLength = 0;
 
   State() = default;
   ~State() = default;
@@ -51,16 +51,17 @@ struct RenderBuffer::State {
     return colorLength* sizeof(float);
   }
 
-  GLsizei BoneWeightSize() const {
-    return boneWeightLength* sizeof(float);
+  GLsizei JointIdSize() const {
+    return jointIdLength * sizeof(float);
   }
 
-  GLsizei BoneIdSize() const {
-    return boneIdLength * sizeof(float);
+  GLsizei JointWeightSize() const {
+    return jointWeightLength * sizeof(float);
   }
 
   GLsizei VertexSize() const {
-    return PositionSize() + NormalSize() + ColorSize() + UVSize() + BoneIdSize() + BoneWeightSize();
+    return PositionSize() + NormalSize() + ColorSize() + UVSize() + JointIdSize() +
+        JointWeightSize();
   }
 };
 
@@ -185,45 +186,45 @@ RenderBuffer::ColorLength() const {
 }
 
 void
-RenderBuffer::DefineBI(const size_t aOffset, const GLsizei aLength) {
-  m.boneIdOffset = aOffset;
-  m.boneIdLength = aLength;
+RenderBuffer::DefineJointId(const size_t aOffset, const GLsizei aLength) {
+  m.jointIdOffset = aOffset;
+  m.jointIdLength = aLength;
 }
 
 void
-RenderBuffer::DefineBW(const size_t aOffset, const GLsizei aLength) {
-  m.boneWeightOffset = aOffset;
-  m.boneWeightLength = aLength;
+RenderBuffer::DefineJointWeight(const size_t aOffset, const GLsizei aLength) {
+  m.jointWeightOffset = aOffset;
+  m.jointWeightLength = aLength;
 }
 
 
-  GLsizei
-RenderBuffer::BoneIdLength() const {
-  return m.boneIdLength;
+GLsizei
+RenderBuffer::JointIdLength() const {
+  return m.jointIdLength;
 }
 
 size_t
-RenderBuffer::BoneIdOffset() const {
-  return m.boneIdOffset;
+RenderBuffer::JointIdOffset() const {
+  return m.jointIdOffset;
 }
 GLsizei
-RenderBuffer::BoneWeightLength() const {
-  return m.boneWeightLength;
-}
-
-GLsizei
-RenderBuffer::BoneIdSize() const {
-  return m.BoneIdSize();
+RenderBuffer::JointWeightLength() const {
+  return m.jointWeightLength;
 }
 
 GLsizei
-RenderBuffer::BoneWeightSize() const {
-  return m.BoneWeightSize();
+RenderBuffer::JointIdSize() const {
+  return m.JointIdSize();
+}
+
+GLsizei
+RenderBuffer::JointWeightSize() const {
+  return m.JointWeightSize();
 }
 
 size_t
-RenderBuffer::BoneWeightOffset() const {
-  return m.boneWeightOffset;
+RenderBuffer::JointWeightOffset() const {
+  return m.jointWeightOffset;
 }
 
 GLsizei

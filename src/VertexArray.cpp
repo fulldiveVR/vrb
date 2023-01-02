@@ -28,8 +28,8 @@ struct VertexArray::State {
   std::vector<NormalState> normals;
   std::vector<Vector> uvs;
   std::vector<Color> colors;
-  std::vector<Vector4> bonesIds;
-  std::vector<Vector4> bonesWeights;
+  std::vector<Vector4> joints;
+  std::vector<Vector4> jointsWeights;
 };
 
 VertexArrayPtr
@@ -58,13 +58,13 @@ VertexArray::GetColorCount() const {
 }
 
 int
-VertexArray::GetBonesWeightsCount() const {
-  return m.bonesWeights.size();
+VertexArray::GetJointWeightsCount() const {
+  return m.jointsWeights.size();
 }
 
 int
-VertexArray::GetBonesIdsCount() const {
-  return m.bonesIds.size();
+VertexArray::GetJointIdsCount() const {
+  return m.joints.size();
 }
 
 void
@@ -129,19 +129,19 @@ VertexArray::GetColor(const int aIndex) const {
 }
 
 const Vector4&
-VertexArray::GetBoneId(const int aIndex) const {
-  if (aIndex >= m.bonesIds.size()) {
+VertexArray::GetJoints(const int aIndex) const {
+  if (aIndex >= m.joints.size()) {
     return Vector4::Zero();
   }
-  return m.bonesIds[aIndex];
+  return m.joints[aIndex];
 }
 
 const Vector4&
-VertexArray::GetBoneWeight(const int aIndex) const {
-  if (aIndex >= m.bonesWeights.size()) {
+VertexArray::GetJointWeights(const int aIndex) const {
+  if (aIndex >= m.jointsWeights.size()) {
     return Vector4::Zero();
   }
-  return m.bonesWeights[aIndex];
+  return m.jointsWeights[aIndex];
 }
 
 void
@@ -213,15 +213,15 @@ VertexArray::AppendColor(const Color& aColor) {
 }
 
 int
-VertexArray::AppendBonesWeights(const Vector4& weights) {
-  m.bonesWeights.push_back(weights);
-  return m.bonesWeights.size() - 1;
+VertexArray::AppendJointWeights(const Vector4& weights) {
+  m.jointsWeights.push_back(weights);
+  return m.jointsWeights.size() - 1;
 }
 
 int
-VertexArray::AppendBonesIds(const Vector4& ids) {
-  m.bonesIds.push_back(ids);
-  return m.bonesIds.size() - 1;
+VertexArray::AppendJoints(const Vector4& ids) {
+  m.joints.push_back(ids);
+  return m.joints.size() - 1;
 }
 
 VertexArray::VertexArray(State& aState, CreationContextPtr& aContext) : m(aState) {}

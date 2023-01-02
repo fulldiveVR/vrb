@@ -66,9 +66,12 @@ GeometryDrawable::Draw(const Camera& aCamera, const Matrix& aModelTransform) {
     }
 
     if (kUseBones && m.renderState->AttributeBoneId() >=0 ) {
-      VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeBoneId(), m.renderBuffer->BoneIdLength(), GL_FLOAT, GL_FALSE, m.renderBuffer->BoneIdSize(), (const GLvoid*)m.renderBuffer->BoneIdOffset()));
-      VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeBoneWeight(), m.renderBuffer->BoneWeightLength(), GL_FLOAT, GL_FALSE, kSize,
-                                         (const GLvoid*)m.renderBuffer->BoneWeightOffset()));
+      VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeBoneId(),
+                                         m.renderBuffer->JointIdLength(), GL_FLOAT, GL_FALSE,
+                                         kSize, (const GLvoid*) m.renderBuffer->JointIdOffset()));
+      VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeBoneWeight(),
+                                         m.renderBuffer->JointWeightLength(), GL_FLOAT, GL_FALSE, kSize,
+                                         (const GLvoid*) m.renderBuffer->JointWeightOffset()));
     }
 
     VRB_GL_CHECK(glEnableVertexAttribArray((GLuint)m.renderState->AttributePosition()));
