@@ -52,7 +52,7 @@ GeometryDrawable::Draw(const Camera& aCamera, const Matrix& aModelTransform) {
   if (m.renderState->Enable(aCamera.GetPerspective(), aCamera.GetView(), aModelTransform)) {
     const bool kUseTexture = m.UseTexture();
     const bool kUseColor = m.UseColor();
-    const bool kUseBones = m.UseBones();
+    const bool kUseJoints = m.UseJoints();
     const GLsizei kSize = m.renderBuffer->VertexSize();
     m.renderBuffer->Bind();
 
@@ -65,11 +65,11 @@ GeometryDrawable::Draw(const Camera& aCamera, const Matrix& aModelTransform) {
       VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeColor(), m.renderBuffer->ColorLength(), GL_FLOAT, GL_FALSE, kSize, (const GLvoid*)m.renderBuffer->ColorOffset()));
     }
 
-    if (kUseBones && m.renderState->AttributeBoneId() >=0 ) {
-      VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeBoneId(),
+    if (kUseJoints && m.renderState->AttributeJoint() >= 0 ) {
+      VRB_GL_CHECK(glVertexAttribPointer((GLuint) m.renderState->AttributeJoint(),
                                          m.renderBuffer->JointIdLength(), GL_FLOAT, GL_FALSE,
                                          kSize, (const GLvoid*) m.renderBuffer->JointIdOffset()));
-      VRB_GL_CHECK(glVertexAttribPointer((GLuint)m.renderState->AttributeBoneWeight(),
+      VRB_GL_CHECK(glVertexAttribPointer((GLuint) m.renderState->AttributeJointWeight(),
                                          m.renderBuffer->JointWeightLength(), GL_FLOAT, GL_FALSE, kSize,
                                          (const GLvoid*) m.renderBuffer->JointWeightOffset()));
     }
@@ -82,9 +82,9 @@ GeometryDrawable::Draw(const Camera& aCamera, const Matrix& aModelTransform) {
     if (kUseColor) {
       VRB_GL_CHECK(glEnableVertexAttribArray((GLuint)m.renderState->AttributeColor()));
     }
-    if (kUseBones && m.renderState->AttributeBoneId() >=0 ) {
-      VRB_GL_CHECK(glEnableVertexAttribArray((GLuint)m.renderState->AttributeBoneId()));
-      VRB_GL_CHECK(glEnableVertexAttribArray((GLuint)m.renderState->AttributeBoneWeight()));
+    if (kUseJoints && m.renderState->AttributeJoint() >= 0 ) {
+      VRB_GL_CHECK(glEnableVertexAttribArray((GLuint) m.renderState->AttributeJoint()));
+      VRB_GL_CHECK(glEnableVertexAttribArray((GLuint) m.renderState->AttributeJointWeight()));
     }
 
     const int32_t maxLength = m.renderBuffer->IndexCount();
@@ -103,9 +103,9 @@ GeometryDrawable::Draw(const Camera& aCamera, const Matrix& aModelTransform) {
     if (kUseColor) {
       VRB_GL_CHECK(glDisableVertexAttribArray((GLuint)m.renderState->AttributeColor()));
     }
-    if (kUseBones && m.renderState->AttributeBoneId() >=0 ) {
-      VRB_GL_CHECK(glDisableVertexAttribArray((GLuint)m.renderState->AttributeBoneId()));
-      VRB_GL_CHECK(glDisableVertexAttribArray((GLuint)m.renderState->AttributeBoneWeight()));
+    if (kUseJoints && m.renderState->AttributeJoint() >= 0 ) {
+      VRB_GL_CHECK(glDisableVertexAttribArray((GLuint) m.renderState->AttributeJoint()));
+      VRB_GL_CHECK(glDisableVertexAttribArray((GLuint) m.renderState->AttributeJointWeight()));
     }
     m.renderBuffer->Unbind();
     m.renderState->Disable();

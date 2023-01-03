@@ -79,7 +79,7 @@ Geometry::UpdateBuffers() {
 
   const bool kHasTextureCoords = m.vertexArray->GetUVCount() > 0;
   const bool kHasColor = m.vertexArray->GetColorCount() > 0;
-  const bool kHasBones =
+  const bool kHasJoints =
       m.vertexArray->GetJointIdsCount() > 0 && m.vertexArray->GetJointWeightsCount() > 0;
   const GLsizei kPositionSize = m.renderBuffer->PositionSize();
   const GLsizei kNormalSize = m.renderBuffer->NormalSize();
@@ -126,7 +126,7 @@ Geometry::UpdateBuffers() {
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kColorSize, firstColor.Data()));
         offset += kColorSize;
       }
-      if (kHasBones) {
+      if (kHasJoints) {
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBISize, firstJointId.Data()));
         offset += kBISize;
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBWSize, firstJointWeight.Data()));
@@ -155,7 +155,7 @@ Geometry::UpdateBuffers() {
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kColorSize, color1.Data()));
         offset += kColorSize;
       }
-      if (kHasBones) {
+      if (kHasJoints) {
         const Vector4 bi = m.vertexArray->GetJoints(vertexIndex);
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBISize, bi.Data()));
         offset += kBISize;
@@ -186,7 +186,7 @@ Geometry::UpdateBuffers() {
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kColorSize, color2.Data()));
         offset += kColorSize;
       }
-      if (kHasBones) {
+      if (kHasJoints) {
         const Vector4 bi = m.vertexArray->GetJoints(vertexIndex);
         VRB_GL_CHECK(glBufferSubData(GL_ARRAY_BUFFER, offset, kBISize, bi.Data()));
         offset += kBISize;

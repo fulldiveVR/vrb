@@ -22,8 +22,8 @@ public:
   GLint AttributeNormal() const;
   GLint AttributeUV() const;
   GLint AttributeColor() const;
-  GLint AttributeBoneId() const;
-  GLint AttributeBoneWeight() const;
+  GLint AttributeJoint() const;
+  GLint AttributeJointWeight() const;
   uint32_t GetLightId() const;
   void ResetLights(const uint32_t aId);
   void AddLight(const Vector& aDirection, const Color& aAmbient, const Color& aDiffuse, const Color& aSpecular);
@@ -31,8 +31,8 @@ public:
   void SetAmbient(const Color& aColor);
   void SetDiffuse(const Color& aColor);
   void SetSkeletonMatrices(const float *matrices);
-  uint16_t GetBonesCount() const;
-  void SetBonesCount(const uint16_t bonesCount);
+  uint16_t GetJointsCount() const;
+  void SetJointsCount(const uint16_t jointsCount);
   void GetMaterial(Color& aAmbient, Color& aDiffuse, Color& aSpecular, float& aSpecularExponent) const;
   GLint UVLength() const;
   TexturePtr GetTexture() const;

@@ -34,8 +34,8 @@ struct GeometryDrawable::State : public Node::State, public Drawable::State {
     }
     return renderState->HasTexture() && (renderBuffer->UVLength() > 0);
   }
-  bool UseBones() const {
-    return renderState && renderState->GetBonesCount() > 0 && renderBuffer->JointWeightSize() > 0 &&
+  bool UseJoints() const {
+    return renderState && renderState->GetJointsCount() > 0 && renderBuffer->JointWeightSize() > 0 &&
         renderBuffer->JointIdSize() > 0;
   }
 

@@ -31,7 +31,7 @@ public:
 
   ProgramPtr GetProgram();
   void SetFeatures(const uint32_t aFeatureMask, const std::string &aCustomFragShader);
-  void SetBones(const uint16_t aBonusCount);
+  void SetJointsCount(const uint16_t aJointsCount);
   void Finalize();
 
   // ResourceGL Interface
@@ -55,9 +55,9 @@ struct ProgramBuilder::State : public ResourceGL::State {
   GLuint vertexShader;
   GLuint fragmentShader;
   GLuint programHandle;
-  GLuint bonesCount;
+  GLuint jointsCount;
 
-  State() : program(Program::Create()), featureMask(0), vertexShader(0), fragmentShader(0), programHandle(0), bonesCount(0) {}
+  State() : program(Program::Create()), featureMask(0), vertexShader(0), fragmentShader(0), programHandle(0), jointsCount(0) {}
   bool IsTexturingEnabled() { return (featureMask & (FeatureTexture | FeatureCubeTexture | FeatureSurfaceTexture)) != 0; }
   bool IsCubeMapTextureEnabled() { return (featureMask & FeatureCubeTexture) != 0; }
   bool IsSurfaceTextureEnabled() { return (featureMask & FeatureSurfaceTexture) != 0;}
@@ -101,8 +101,8 @@ ProgramBuilder::SetFeatures(const uint32_t aFeatureMask, const std::string &aCus
 }
 
 void
-ProgramBuilder::SetBones(const uint16_t aBonusCount) {
-  m.bonesCount = aBonusCount;
+ProgramBuilder::SetJointsCount(const uint16_t aJointsCount) {
+  m.jointsCount = aJointsCount;
 }
 
 void
@@ -137,10 +137,10 @@ ProgramBuilder::InitializeGL() {
     vertexShaderSource.replace(kVertexColorStart, kVertexColorMacro.length(), (m.featureMask & FeatureVertexColor) != 0 ? "1" : "0");
   }
 
-  const std::string kBonesMacro("VRB_BONES_COUNT");
-  const size_t kBonesStart = vertexShaderSource.find(kBonesMacro);
-  if (kBonesStart != std::string::npos) {
-    vertexShaderSource.replace(kBonesStart, kBonesMacro.length(), std::to_string(m.bonesCount));
+  const std::string kJointMacro("VRB_JOINTS_COUNT");
+  const size_t kJointStart = vertexShaderSource.find(kJointMacro);
+  if (kJointStart != std::string::npos) {
+    vertexShaderSource.replace(kJointStart, kJointMacro.length(), std::to_string(m.jointsCount));
   }
 
   const std::string kTextureMacro("VRB_TEXTURE_STATE");
@@ -236,8 +236,8 @@ ProgramFactory::CreateProgram(CreationContextPtr &aContext, const uint32_t aFeat
 }
 ProgramPtr
 ProgramFactory::CreateProgram(CreationContextPtr &aContext, const uint32_t aFeatureMask,
-                              const std::string &aCustomFragShader, const uint16_t aBonesCount) {
-  const std::string key = std::to_string(aFeatureMask) + aCustomFragShader + std::to_string(aBonesCount);
+                              const std::string &aCustomFragShader, const uint16_t aJointsCount) {
+  const std::string key = std::to_string(aFeatureMask) + aCustomFragShader + std::to_string(aJointsCount);
   ProgramBuilderPtr builder;
   bool created = false;
   {
@@ -247,7 +247,7 @@ ProgramFactory::CreateProgram(CreationContextPtr &aContext, const uint32_t aFeat
     if (found == m.programs.end()) {
       builder = ProgramBuilder::Create(m.loader);
       builder->SetFeatures(aFeatureMask, aCustomFragShader);
-      builder->SetBones(aBonesCount);
+      builder->SetJointsCount(aJointsCount);
       m.programs[key] = builder;
       created = true;
     } else {
