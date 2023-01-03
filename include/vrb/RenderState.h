@@ -30,7 +30,7 @@ public:
   void SetMaterial(const Color& aAmbient, const Color& aDiffuse, const Color& aSpecular, const float aSpecularExponent);
   void SetAmbient(const Color& aColor);
   void SetDiffuse(const Color& aColor);
-  void SetSkeletonMatrices(const float *matrices);
+  void SetJointsMatrices(const float *matrices);
   uint16_t GetJointsCount() const;
   void SetJointsCount(const uint16_t jointsCount);
   void GetMaterial(Color& aAmbient, Color& aDiffuse, Color& aSpecular, float& aSpecularExponent) const;

@@ -268,12 +268,15 @@ RenderState::SetDiffuse(const Color& aColor) {
   m.diffuse = aColor;
 }
 void
-RenderState::SetSkeletonMatrices(const float *matrices) {
+RenderState::SetJointsMatrices(const float *matrices) {
   memcpy(m.jointMatrices, matrices, 16 * m.jointsCount * sizeof(float));
 }
 
 void
 RenderState::SetJointsCount(const uint16_t jointsCount) {
+  if (m.jointMatrices != nullptr) {
+    delete[] m.jointMatrices;
+  }
   m.jointMatrices = new float[16 * jointsCount];
   const float matrix[16] = {
       1.000000, 0.000000, 0.000000, 0.000000,
