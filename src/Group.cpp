@@ -132,7 +132,7 @@ Group::RemoveLight(const Light& aLight) {
 
 void
 Group::AddNode(NodePtr aNode) {
-  if (!m.Contains(*aNode)) {
+  if (aNode && !m.Contains(*aNode)) {
     AddToParents(m.self, *aNode);
     m.children.push_back(std::move(aNode));
   }
